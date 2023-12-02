@@ -26,25 +26,22 @@ digit_map = {
 pattern = re.compile(r'[\d]|zero|one|two|three|four|five|six|seven|eight|nine')
 
 
-def find_last_digit(line: str, start):
-    pos = start
+def find_last_digit(line: str):
+    pos = len(line) - 1
     while pos >= 0:
-        all_digits = pattern.findall(line, pos)
-        if len(all_digits) > 1:
-            print('something went wrong')
-        if len(all_digits) == 1:
-            return all_digits[0]
+        m = pattern.match(line, pos)
+        if m:
+            return m.group()
         pos -= 1
 
 
-sum = 0
-with open('input', 'r') as file:
-    for line in file:
-        digits = pattern.findall(line)
-        first_digit = digit_map.get(digits[0])
-        last_digit = digit_map.get(find_last_digit(line, len(line) - 1))
-        two_digit_number = 10 * first_digit + last_digit
-        sum += two_digit_number
-        print(f"{first_digit}, {last_digit}, {line}")
+if __name__ == '__main__':
+    sum = 0
+    with open('input', 'r') as file:
+        for line in file:
+            first_digit = digit_map[pattern.search(line).group()]
+            last_digit = digit_map[find_last_digit(line)]
+            two_digit_number = 10 * first_digit + last_digit
+            sum += two_digit_number
 
-print(sum)
+    print(sum)  # 54985

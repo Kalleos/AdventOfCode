@@ -1,22 +1,11 @@
 import re
-from re import Pattern
-
-
-def get_nr(set_str: str, pattern: Pattern):
-    nrs = pattern.findall(set_str)
-    return int(nrs[0]) if len(nrs) > 0 else 0
 
 
 def get_set(set_str: str):
-    red_pattern = re.compile(r'(\d+)\s+red')
-    blue_pattern = re.compile(r'(\d+)\s+blue')
-    green_pattern = re.compile(r'(\d+)\s+green')
-    my_set = {
-        'red': get_nr(set_str, red_pattern),
-        'blue': get_nr(set_str, blue_pattern),
-        'green': get_nr(set_str, green_pattern)
-    }
-    return my_set
+    # 1 red, 4 blue, 2 green
+    pattern = re.compile(r'(\d+)\s+([a-z]+)')
+    cubes = pattern.findall(set_str)
+    return dict([(color, int(nr)) for (nr, color) in cubes])
 
 
 def get_sets(game_str: str):
@@ -26,20 +15,21 @@ def get_sets(game_str: str):
 def is_valid_game(game):
     for set in game:
         # 12 red cubes, 13 green cubes, and 14 blue cubes
-        if set.get('red') > 12 or set.get('green') > 13 or set.get('blue') > 14:
+        if 'red' in set and set['red'] > 12 \
+                or 'green' in set and set['green'] > 13 \
+                or 'blue' in set and set['blue'] > 14:
             return False
     return True
 
 
-with open('input', 'r') as file:
-    game_nr = 0
-    sum = 0
-    for line in file:
-        game_str = line.split(':')[1].strip()
-        game = get_sets(game_str)
-        print(game)
-        game_nr += 1
-        if is_valid_game(game):
-            sum += game_nr
+if __name__ == '__main__':
+    with open('input', 'r') as file:
+        sum = 0
+        for line in file:
+            game_nr = int(re.findall(r'^Game (\d+):', line)[0])
+            game_str = line.split(':')[1].strip()
+            game = get_sets(game_str)
+            if is_valid_game(game):
+                sum += game_nr
 
-    print(sum) # 2528
+        print(sum)  # 2528
