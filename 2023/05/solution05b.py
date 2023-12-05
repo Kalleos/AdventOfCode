@@ -1,4 +1,5 @@
 import re
+from itertools import chain
 
 
 def get_map_value(s_d_map, source_value):
@@ -6,6 +7,13 @@ def get_map_value(s_d_map, source_value):
         if s <= source_value < s + length:
             return d + (source_value - s)
     return source_value
+
+
+def get_reverse_map_value(s_d_map, dest_value):
+    for [d, s, length] in s_d_map:
+        if d <= dest_value < d + length:
+            return s + (dest_value - d)
+    return dest_value
 
 
 def get_location(seed, maps):
@@ -17,13 +25,23 @@ def get_location(seed, maps):
 
 def get_seeds(line):
     seeds = []
-    ns = re.findall('\d+', line)
-    print(ns)
+    ns = re.findall(r'\d+', line)
     for i in range(int(len(ns) / 2)):
         s = int(ns[2 * i])
         l = int(ns[2 * i + 1])
         seeds.append((s, l))
     return seeds
+
+
+def flatten(matrix):
+    return list(chain.from_iterable(matrix))
+
+
+def is_in_seed_intervals(seed_intervals, value):
+    for (s, l) in seed_intervals:
+        if s <= value < s + l:
+            return True
+    return False
 
 
 def read_file(filename):
@@ -32,7 +50,7 @@ def read_file(filename):
     with open(filename, 'r') as file:
         for line in file.read().splitlines():
             if line.startswith('seeds:'):
-                seeds = get_seeds(line)  # re.findall('\d+', line)
+                seed_intervals = get_seeds(line)
                 continue
 
             if line.endswith('map:'):
@@ -41,21 +59,26 @@ def read_file(filename):
                 new_map = []
                 continue
 
-            ns = re.findall('\d+', line)
+            ns = re.findall(r'\d+', line)
             if len(ns) == 3:
                 new_map.append([int(n) for n in ns])
         maps.append(new_map)
 
-    # print(seeds)
-    # print(maps)
+    maps.reverse()
+    limits = []
+    for my_map in maps:
+        limits.extend(flatten([[d, d + length - 1] for [d, _, length] in my_map]))
+        limits = [get_reverse_map_value(my_map, limit) for limit in limits]
 
-    min_loc = get_location(seeds[0][0], maps)
-    for seed_range in seeds:
-        for seed in range(seed_range[0], seed_range[0]+1): #seed_range[0] + seed_range[1]):
-            loc = get_location(seed, maps)
-            if loc < min_loc:
-                min_loc = loc
-                print(min_loc)
+    relevant_limits = [value for value in limits if is_in_seed_intervals(seed_intervals, value)]
+    seeds = flatten([[s, s + l - 1] for (s, l) in seed_intervals]) + relevant_limits
+
+    maps.reverse()
+    min_loc = get_location(seeds[0], maps)
+    for seed in seeds:
+        loc = get_location(seed, maps)
+        if loc < min_loc:
+            min_loc = loc
 
     print(min_loc)
 
