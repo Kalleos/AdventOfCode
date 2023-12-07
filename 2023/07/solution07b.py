@@ -1,10 +1,17 @@
 import itertools
 
-card_rank = list(reversed('A,K,Q,J,T,9,8,7,6,5,4,3,2'.split(',')))
+card_rank = list(reversed('A,K,Q,T,9,8,7,6,5,4,3,2,J'.split(',')))
 
 
-def get_type_pattern(hand):
-    return ''.join(sorted([str(len(list(g))) for k, g in itertools.groupby(sorted(hand))], reverse=True))
+def get_type_pattern(hand: str):
+    js = hand.count('J')
+    hand_without_j = hand.replace('J', '')
+    pattern_j = sorted([len(list(g)) for k, g in itertools.groupby(sorted(hand_without_j))], reverse=True)
+    if len(pattern_j) == 0:
+        pattern_j = [5]
+    else:
+        pattern_j[0] = pattern_j[0] + js
+    return ''.join([str(i) for i in pattern_j])
 
 
 def get_valued_hand(hand):
