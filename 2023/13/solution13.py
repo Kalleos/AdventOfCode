@@ -23,30 +23,30 @@ def difference(l1, l2):
     return sum([0 if x == y else 1 for x, y in zip(l1, l2)])
 
 
-def get_vertical_mirror(m):
+def get_vertical_mirror(m, diff):
     for i in range(1, len(m[0])):
-        if all([get_column(m, i - k - 1) == get_column(m, i + k) for k in range(min(i, len(m[0]) - i))]):
+        if sum([difference(get_column(m, i - k - 1), get_column(m, i + k)) for k in range(min(i, len(m[0]) - i))]) == diff:
             return i
 
 
-def get_horizontal_mirror(m):
+def get_horizontal_mirror(m, diff):
     for i in range(1, len(m)):
-        if all([m[i - k - 1] == m[i + k] for k in range(min(i, len(m) - i))]):
+        if sum([difference(m[i - k - 1], m[i + k]) for k in range(min(i, len(m) - i))]) == diff:
             return i
 
 
-def solve(filename):
+def solve(filename, diff):
     with (open(filename) as file):
         lines = file.read().splitlines()
         ms = read_matrices(lines)
 
         result = 0
         for m in ms:
-            v = get_vertical_mirror(m)
+            v = get_vertical_mirror(m, diff)
             if v:
                 result += v
             else:
-                h = get_horizontal_mirror(m)
+                h = get_horizontal_mirror(m, diff)
                 if h:
                     result += 100 * h
                 else:
@@ -56,5 +56,7 @@ def solve(filename):
 
 
 if __name__ == '__main__':
-    solve('test_input') # 405
-    solve('input') # 32035
+    solve('test_input', 0) # 405
+    solve('input', 0) # 32035
+    solve('test_input', 1)
+    solve('input', 1)
