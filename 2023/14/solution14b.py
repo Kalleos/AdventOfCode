@@ -37,7 +37,7 @@ def solve(filename):
             matrix = tilt(matrix, 'W')
             matrix = tilt(matrix, 'S')
             matrix = tilt(matrix, 'E')
-            load = get_loads(list(matrix))
+            load = get_loads(matrix)
             loads.append(load)
 
 
