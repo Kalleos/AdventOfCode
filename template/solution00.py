@@ -4,9 +4,13 @@ def parse_input(filename: str):
 
 
 def solve(filename: str):
-    parse_input(filename)
+    data = parse_input(filename)
+    result = 0
+
+    print(result)
+    return result
 
 
 if __name__ == '__main__':
-    solve('test_input')
+    assert solve('test_input') == 0
     # solve('input')
